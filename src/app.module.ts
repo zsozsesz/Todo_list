@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TaskModule } from './task/task.module';
@@ -15,7 +13,7 @@ import { MulterModule } from '@nestjs/platform-express/multer';
       useClass: MulterOptionService,
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService, MulterOptionService],
+  controllers: [],
+  providers: [MulterOptionService],
 })
 export class AppModule {}
