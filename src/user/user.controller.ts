@@ -11,7 +11,7 @@ export class UserController {
     constructor(private readonly userService: UserService) {}
 
     @Get()
-    @SetMetadata('roles', ['ADMIN'])
+    @SetMetadata('roles', ['USER'])
     findAll(): Promise<User[]> {
         return this.userService.findAll();
     }

@@ -9,6 +9,7 @@ export class ResponseTransformInterceptor<T> implements NestInterceptor<T, Respo
     return next.handle().pipe(map(data => {
         return {
           success:  true,
+          statusCode: 200,
           error: null,
           data,
         };

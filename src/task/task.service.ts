@@ -1,10 +1,11 @@
 import { AssignToUserDto } from './dto/assign-to-user.dto';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
+import * as moment from 'moment';
 
 @Injectable()
 export class TaskService {
@@ -20,6 +21,9 @@ export class TaskService {
     }
 
     async create(createTaskDto: CreateTaskDto): Promise<Task> {
+        if (!moment(createTaskDto.startDate, 'YYYY-MM-DD', true).isValid() || !moment(createTaskDto.endDate, 'YYYY-MM-DD', true).isValid()) {
+            throw new BadRequestException();
+        }
         const task = await this.taskRepository.save(createTaskDto);
         return task;
     }
