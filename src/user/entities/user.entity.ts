@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable} from 'typeorm';
+import { Task } from 'src/task/entities/task.entity';
 
 @Entity()
 export class User {
@@ -19,4 +20,18 @@ export class User {
 
   @Column({default: 'USER'})
   role: string;
+
+  @ManyToMany(type => Task)
+  @JoinTable({
+      name: 'user_task' ,
+      joinColumn: {
+          name: 'user_id',
+          referencedColumnName: 'id',
+      },
+      inverseJoinColumn: {
+          name: 'task_id',
+          referencedColumnName: 'id',
+      },
+  })
+  tasks: Task[];
 }
