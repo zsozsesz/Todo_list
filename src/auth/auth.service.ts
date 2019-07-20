@@ -44,7 +44,7 @@ export class AuthService {
         const { name, confirmPassword, email, role} = createUserDto;
         let { password } = createUserDto;
 
-        const avatar = file ? file.filename : 'avatar';
+        const avatar = file ? file.originalname : 'avatar';
         if (password === confirmPassword && !await this.userRepository.findOne({email})) {
             password = await bcrypt.hash(password, this.saltRounds);
             const user = await this.userRepository.save({name, password, email, avatar, role});

@@ -6,10 +6,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TaskModule } from './task/task.module';
 import { AuthModule } from './auth/auth.module';
 import { TYPEORM } from './config/config';
+import { MulterOptionService } from './common/multer-option/multer-option.service';
+import { MulterModule } from '@nestjs/platform-express/multer';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(TYPEORM), UserModule, TaskModule, AuthModule],
+  imports: [TypeOrmModule.forRoot(TYPEORM), UserModule, TaskModule, AuthModule,
+    MulterModule.registerAsync({
+      useClass: MulterOptionService,
+    }),
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MulterOptionService],
 })
 export class AppModule {}
