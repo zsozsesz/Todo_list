@@ -2,8 +2,11 @@ import { AssignToUserDto } from './dto/assign-to-user.dto';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskService } from './task.service';
 import { Task } from './entities/task.entity';
-import { Controller, Get, Body, Post } from '@nestjs/common';
+import { Controller, Get, Body, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('task')
 export class TaskController {
 
