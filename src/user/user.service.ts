@@ -55,4 +55,11 @@ export class UserService {
          user.role = updateUserDto.role ? updateUserDto.role : user.role;
          return await this.userRepository.save(user);
     }
+
+    async updateAvatar(file, id): Promise<User> {
+        const avatar = file ? file.filename : 'avatar';
+        const user = await this.userRepository.findOne(id);
+        user.avatar = avatar;
+        return await this.userRepository.save(user);
+    }
 }

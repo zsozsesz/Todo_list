@@ -1,12 +1,13 @@
 import { CreateUserDto } from './dto/create-user.dto';
 
-import { Controller, Get, UseGuards, SetMetadata, Request, Post, Body, Delete, Param, Put } from '@nestjs/common';
+import { Controller, Get, UseGuards, SetMetadata, Request, Post, Body, Delete, Param, Put, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { CreateTaskDto } from 'src/task/dto/create-task.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('user')
@@ -47,5 +48,11 @@ export class UserController {
     @Put(':id')
     update(@Body() updateUserDto: UpdateUserDto, @Param('id') id: number) {
         return this.userService.update(updateUserDto, id);
+    }
+
+    @Put('avatar/:id')
+    @UseInterceptors(FileInterceptor('file'))
+    updateAvatar(@UploadedFile() file, @Param('id') id: number) {
+        this.userService.updateAvatar(file, id);
     }
 }
