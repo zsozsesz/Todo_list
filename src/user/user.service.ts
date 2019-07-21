@@ -6,6 +6,7 @@ import { Repository, Not } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateTaskDto } from 'src/task/dto/create-task.dto';
 import {getManager} from 'typeorm';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -37,10 +38,10 @@ export class UserService {
          return 'deleted';
      }
 
-     async update(createUserDto: CreateUserDto, id: number): Promise<User> {
+     async update(updateUserDto: UpdateUserDto, id: number): Promise<User> {
          const check = await this.userRepository.findOne({
              where: [
-                 {email: createUserDto.email},
+                 {email: updateUserDto.email},
                  {id:  Not(id)},
              ],
          });
@@ -49,9 +50,9 @@ export class UserService {
          }
 
          const user = await this.userRepository.findOne(id);
-         user.email = createUserDto.email;
-         user.name = createUserDto.name;
-         user.role = createUserDto.role;
+         user.email = updateUserDto.email ? updateUserDto.email : user.email;
+         user.name = updateUserDto.name ? updateUserDto.name : user.name;
+         user.role = updateUserDto.role ? updateUserDto.role : user.role;
          return await this.userRepository.save(user);
     }
 }

@@ -6,12 +6,13 @@ import { User } from './entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { CreateTaskDto } from 'src/task/dto/create-task.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('user')
 export class UserController {
 
-    constructor(private readonly userService: UserService,) {}
+    constructor(private readonly userService: UserService) {}
 
     @Get()
     @SetMetadata('roles', ['ADMIN'])
@@ -44,7 +45,7 @@ export class UserController {
     }
 
     @Put(':id')
-    update(@Body() createUserDto: CreateUserDto, @Param('id') id: number) {
-        return this.userService.update(createUserDto, id);
+    update(@Body() updateUserDto: UpdateUserDto, @Param('id') id: number) {
+        return this.userService.update(updateUserDto, id);
     }
 }
