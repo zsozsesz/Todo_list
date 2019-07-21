@@ -1,4 +1,4 @@
-import { AssignToUserDto } from './dto/assign-to-user.dto';
+import { AssignDto } from './dto/assign.dto';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
@@ -28,10 +28,10 @@ export class TaskService {
         return task;
     }
 
-    async assignToUser(assignToUserDto: AssignToUserDto): Promise<Task> {
+    async assignToUser(assignDto: AssignDto): Promise<Task> {
         try {
-            const task = await this.taskRepository.findOneOrFail(assignToUserDto.taskId, { relations: ['users'] });
-            const user = await this.userRepository.findOneOrFail(assignToUserDto.userId);
+            const task = await this.taskRepository.findOneOrFail(assignDto.taskId, { relations: ['users'] });
+            const user = await this.userRepository.findOneOrFail(assignDto.userId);
             task.users.push(user);
             return await this.taskRepository.save(task);
         } catch (error) {
@@ -52,7 +52,7 @@ export class TaskService {
 
     async delete(id: number) {
         await this.taskRepository.delete(id);
-        return 'deleted';
+        return {message: 'deleted'};
     }
 
     async update(createTaskDto: CreateTaskDto, id: number): Promise<Task> {
@@ -65,5 +65,17 @@ export class TaskService {
         task.startDate = createTaskDto.startDate;
         task.endDate = createTaskDto.endDate;
         return this.taskRepository.save(task);
+    }
+
+    async unAssignUser(assignDto: AssignDto) {
+        try {
+            const task = await this.taskRepository.findOneOrFail(assignDto.taskId, { relations: ['users'] });
+            task.users = task.users.filter((user) => {
+                return user.id !== assignDto.userId;
+            });
+            return await this.taskRepository.save(task);
+        } catch (error) {
+            throw new NotFoundException();
+        }
     }
 }

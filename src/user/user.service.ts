@@ -1,12 +1,13 @@
 import { CreateUserDto } from './dto/create-user.dto';
 import { TaskService } from './../task/task.service';
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateTaskDto } from 'src/task/dto/create-task.dto';
 import {getManager} from 'typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AssignDto } from 'src/task/dto/assign.dto';
 
 @Injectable()
 export class UserService {
@@ -56,10 +57,22 @@ export class UserService {
          return await this.userRepository.save(user);
     }
 
-    async updateAvatar(file, id): Promise<User> {
+    async updateAvatar(file, id: number): Promise<User> {
         const avatar = file ? file.filename : 'avatar';
         const user = await this.userRepository.findOne(id);
         user.avatar = avatar;
         return await this.userRepository.save(user);
+    }
+
+    async unAssignTask(assignDto: AssignDto): Promise<User> {
+        try {
+            const user = await this.userRepository.findOneOrFail(assignDto.userId, { relations: ['tasks'] });
+            user.tasks =  user.tasks.filter((task) => {
+                return task.id !== assignDto.taskId;
+            });
+            return await this.userRepository.save(user);
+        } catch (error) {
+            throw new NotFoundException();
+        }
     }
 }

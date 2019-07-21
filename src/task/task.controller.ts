@@ -1,4 +1,4 @@
-import { AssignToUserDto } from './dto/assign-to-user.dto';
+import { AssignDto } from './dto/assign.dto';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskService } from './task.service';
 import { Task } from './entities/task.entity';
@@ -24,8 +24,8 @@ export class TaskController {
     }
 
     @Post('assign')
-    assignToUser(@Body() assignToUserDto: AssignToUserDto) {
-       return this.taskService.assignToUser(assignToUserDto);
+    assignToUser(@Body() assignDto: AssignDto) {
+       return this.taskService.assignToUser(assignDto);
     }
 
     @Get('free/:id')
@@ -41,5 +41,10 @@ export class TaskController {
     @Put(':id')
     update(@Body() createTaskDto: CreateTaskDto, @Param('id') id: number) {
         return this.taskService.update(createTaskDto, id);
+    }
+
+    @Post('unassign')
+    unAssignUser(@Body() assignDto: AssignDto) {
+        return this.taskService.unAssignUser(assignDto);
     }
 }
