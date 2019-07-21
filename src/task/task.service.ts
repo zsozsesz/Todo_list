@@ -39,7 +39,9 @@ export class TaskService {
         }
     }
     async findAssignableUsers(taskId: number): Promise<any> {
-        const sql = `SELECT u.* FROM user u LEFT JOIN user_task ut ON u.id = ut.user_id WHERE ut.task_id <> ${taskId} OR ut.task_id IS NULL`;
+        const sql = `
+            SELECT u.* FROM user u LEFT JOIN user_task ut ON u.id = ut.user_id WHERE ut.task_id <> ${taskId} OR ut.task_id IS NULL GROUP BY u.id
+        `;
         const users: User[] = await getManager().query(sql);
         const response = users.map(user => {
             const {password, ...result} = user;
@@ -51,5 +53,17 @@ export class TaskService {
     async delete(id: number) {
         await this.taskRepository.delete(id);
         return 'deleted';
+    }
+
+    async update(createTaskDto: CreateTaskDto, id: number): Promise<Task> {
+        const task = await this.taskRepository.findOne(id);
+        if (!task) {
+            throw new NotFoundException();
+        }
+        task.name  = createTaskDto.name;
+        task.description = createTaskDto.description;
+        task.startDate = createTaskDto.startDate;
+        task.endDate = createTaskDto.endDate;
+        return this.taskRepository.save(task);
     }
 }

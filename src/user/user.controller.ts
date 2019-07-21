@@ -1,5 +1,6 @@
+import { CreateUserDto } from './dto/create-user.dto';
 
-import { Controller, Get, UseGuards, SetMetadata, Request, Post, Body, Delete, Param } from '@nestjs/common';
+import { Controller, Get, UseGuards, SetMetadata, Request, Post, Body, Delete, Param, Put } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
@@ -40,5 +41,10 @@ export class UserController {
     @SetMetadata('roles', ['ADMIN'])
     delete(@Param('id') id: number) {
         return this.userService.delete(id);
+    }
+
+    @Put(':id')
+    update(@Body() createUserDto: CreateUserDto, @Param('id') id: number) {
+        return this.userService.update(createUserDto, id);
     }
 }

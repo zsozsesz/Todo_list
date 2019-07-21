@@ -1,7 +1,8 @@
+import { CreateUserDto } from './dto/create-user.dto';
 import { TaskService } from './../task/task.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Not } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateTaskDto } from 'src/task/dto/create-task.dto';
 import {getManager} from 'typeorm';
@@ -24,7 +25,9 @@ export class UserService {
     }
 
     async findAssignableTasks(user: User): Promise<any> {
-        const sql = `SELECT t.* FROM task t LEFT JOIN user_task ut ON t.id = ut.task_id WHERE ut.user_id <> ${user.id} OR ut.user_id IS NULL`;
+        const sql = `
+        SELECT t.* FROM task t LEFT JOIN user_task ut ON t.id = ut.task_id WHERE ut.user_id <> ${user.id} OR ut.user_id IS NULL GROUP BY t.id
+        `;
         const task = await getManager().query(sql);
         return task;
      }
@@ -33,4 +36,22 @@ export class UserService {
          await this.userRepository.delete(id);
          return 'deleted';
      }
+
+     async update(createUserDto: CreateUserDto, id: number): Promise<User> {
+         const check = await this.userRepository.findOne({
+             where: [
+                 {email: createUserDto.email},
+                 {id:  Not(id)},
+             ],
+         });
+         if (check) {
+             throw new ConflictException();
+         }
+
+         const user = await this.userRepository.findOne(id);
+         user.email = createUserDto.email;
+         user.name = createUserDto.name;
+         user.role = createUserDto.role;
+         return await this.userRepository.save(user);
+    }
 }
