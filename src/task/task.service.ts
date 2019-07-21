@@ -3,7 +3,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, getManager} from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import * as moment from 'moment';
 
@@ -16,8 +16,8 @@ export class TaskService {
     ) {}
 
     async findAll(): Promise<Task[]> {
-    const tasks = await this.taskRepository.find();
-    return tasks;
+        const tasks = await this.taskRepository.find({relations: ['users'] });
+        return tasks;
     }
 
     async create(createTaskDto: CreateTaskDto): Promise<Task> {
@@ -28,7 +28,7 @@ export class TaskService {
         return task;
     }
 
-    async assignToUser(assignToUserDto: AssignToUserDto): Promise<any> {
+    async assignToUser(assignToUserDto: AssignToUserDto): Promise<Task> {
         try {
             const task = await this.taskRepository.findOneOrFail(assignToUserDto.taskId, { relations: ['users'] });
             const user = await this.userRepository.findOneOrFail(assignToUserDto.userId);
@@ -37,5 +37,19 @@ export class TaskService {
         } catch (error) {
             throw new NotFoundException();
         }
+    }
+    async findAssignableUsers(taskId: number): Promise<any> {
+        const sql = `SELECT u.* FROM user u LEFT JOIN user_task ut ON u.id = ut.user_id WHERE ut.task_id <> ${taskId} OR ut.task_id IS NULL`;
+        const users: User[] = await getManager().query(sql);
+        const response = users.map(user => {
+            const {password, ...result} = user;
+            return result;
+        });
+        return response;
+     }
+
+    async delete(id: number) {
+        await this.taskRepository.delete(id);
+        return 'deleted';
     }
 }

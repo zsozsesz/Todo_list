@@ -2,18 +2,18 @@ import { AssignToUserDto } from './dto/assign-to-user.dto';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskService } from './task.service';
 import { Task } from './entities/task.entity';
-import { Controller, Get, Body, Post, UseGuards, SetMetadata } from '@nestjs/common';
+import { Controller, Get, Body, Post, UseGuards, SetMetadata, Param, Delete } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
+// @SetMetadata('roles', ['ADMIN'])
 @Controller('task')
 export class TaskController {
 
     constructor(private readonly taskService: TaskService) {}
 
     @Get()
-    @SetMetadata('roles', ['ADMIN'])
     findAll(): Promise<Task[]> {
         return this.taskService.findAll();
     }
@@ -24,7 +24,16 @@ export class TaskController {
     }
 
     @Post('assign')
-    async assignToUser(@Body() assignToUserDto: AssignToUserDto) {
+    assignToUser(@Body() assignToUserDto: AssignToUserDto) {
        return this.taskService.assignToUser(assignToUserDto);
+    }
+
+    @Get('free/:id')
+    findAssignableUsers(@Param('id') id: number) {
+        return this.taskService.findAssignableUsers(id);
+    }
+    @Delete(':id')
+    delete(@Param('id') id: number) {
+        return this.taskService.delete(id);
     }
 }
