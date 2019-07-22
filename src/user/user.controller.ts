@@ -27,6 +27,12 @@ export class UserController {
         return req.user;
     }
 
+    @Get(':id')
+    @SetMetadata('roles', ['ADMIN'])
+    getUser(@Param('id') id: number) {
+        return this.userService.findById(id);
+    }
+
     @Post('create')
     @SetMetadata('roles', ['USER', 'ADMIN'])
     createAndAssign(@Body() createTaskDto: CreateTaskDto, @Request() req) {
@@ -36,7 +42,13 @@ export class UserController {
     @Get('assignable')
     @SetMetadata('roles', ['USER', 'ADMIN'])
     findAssignableTasks(@Request() req) {
-        return this.userService.findAssignableTasks(req.user);
+        return this.userService.findAssignableTasks(req.user.id);
+    }
+
+    @Get('assignable/:id')
+    @SetMetadata('roles', ['ADMIN'])
+    findUsersAssignableTasks(@Param('id') id: number) {
+        return this.userService.findAssignableTasks(id);
     }
 
     @Delete(':id')
@@ -46,17 +58,20 @@ export class UserController {
     }
 
     @Put(':id')
+    @SetMetadata('roles', ['ADMIN'])
     update(@Body() updateUserDto: UpdateUserDto, @Param('id') id: number) {
         return this.userService.update(updateUserDto, id);
     }
 
     @Put('avatar/:id')
+    @SetMetadata('roles', ['USER', 'ADMIN'])
     @UseInterceptors(FileInterceptor('file', MULTER_OPTIONS))
     updateAvatar(@UploadedFile() file, @Param('id') id: number) {
         this.userService.updateAvatar(file, id);
     }
 
     @Post('unassign')
+    @SetMetadata('roles', ['ADMIN'])
     unAssignTask(@Body() assignDto: AssignDto) {
         return this.userService.unAssignTask(assignDto);
     }

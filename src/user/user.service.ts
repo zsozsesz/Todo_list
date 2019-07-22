@@ -17,7 +17,11 @@ export class UserService {
         ) {}
 
     async findAll(): Promise<User[]> {
-        return await this.userRepository.find({relations: ['Tasks']});
+        return await this.userRepository.find({relations: ['tasks']});
+    }
+
+    async findById(id: number): Promise<User> {
+        return await this.userRepository.findOne(id, {relations: ['tasks']});
     }
 
     async createAndAssign(createTaskDto: CreateTaskDto, user: User): Promise<User> {
@@ -26,9 +30,9 @@ export class UserService {
         return await this.userRepository.save(user);
     }
 
-    async findAssignableTasks(user: User): Promise<any> {
+    async findAssignableTasks(id: number): Promise<any> {
         const sql = `
-        SELECT t.* FROM task t LEFT JOIN user_task ut ON t.id = ut.task_id WHERE ut.user_id <> ${user.id} OR ut.user_id IS NULL GROUP BY t.id
+        SELECT t.* FROM task t LEFT JOIN user_task ut ON t.id = ut.task_id WHERE ut.user_id <> ${id} OR ut.user_id IS NULL GROUP BY t.id
         `;
         const task = await getManager().query(sql);
         return task;

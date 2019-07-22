@@ -7,7 +7,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
-// @SetMetadata('roles', ['ADMIN'])
+@SetMetadata('roles', ['ADMIN'])
 @Controller('task')
 export class TaskController {
 
