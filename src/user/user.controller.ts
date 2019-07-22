@@ -52,9 +52,15 @@ export class UserController {
     }
 
     @Delete(':id')
-    @SetMetadata('roles', ['ADMIN'])
+    @SetMetadata('roles', ['USER', 'ADMIN'])
     delete(@Param('id') id: number) {
         return this.userService.delete(id);
+    }
+
+    @Put('')
+    @SetMetadata('roles', ['ADMIN'])
+    updateSelf(@Body() updateUserDto: UpdateUserDto, @Request() req) {
+        return this.userService.update(updateUserDto, req.user.id);
     }
 
     @Put(':id')
