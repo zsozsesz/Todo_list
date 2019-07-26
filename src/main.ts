@@ -4,7 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import * as helmet from 'helmet';
 import * as express from 'express';
 import * as path from 'path';
-
+//startpoint
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
